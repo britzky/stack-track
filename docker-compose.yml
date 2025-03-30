@@ -1,0 +1,33 @@
+services:
+  api:
+    build: ./services/api-gateway
+    container_name: api_gateway
+    ports:
+      - '3000:3000'
+    stdin_open: true
+    tty: true
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/stack_track
+  
+  frontend:
+    build: ./frontend
+    container_name: stack_track_frontend
+    ports: 
+      - '5173:5173'
+    depends_on:
+      - api
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_DATABASE=stack_track
+    volumes:
+      - mongodb_data:/data/db
+      - ./infrastructure/mongo/init-db.js:/docker-entrypoint-initdb.d/init-db.js
+  
+volumes:
+  mongodb_data:
